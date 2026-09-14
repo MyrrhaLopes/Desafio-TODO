@@ -30,3 +30,5 @@ export const TasksTable = pgTable("tasks", {
   createdAt: timestamp("create_at").defaultNow(),
   userId: serial("user_id").references(() => usersTable.id),
 });
+export type TasksInsert = typeof TasksTable.$inferInsert;
+export type TasksSelect = typeof TasksTable.$inferSelect;

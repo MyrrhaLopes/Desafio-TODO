@@ -8,12 +8,20 @@
 - Tanstack Query: caching e revalidação inteligentes pro front-end,
 
 # Passo-a-passo para instalar e rodar localmente:
-instale os pacotes necessários rodando:
-`npm install`
+REQUISITOS:
+- ter o psql instalado;
+- ter o node instalado
 
-configure as seguintes variáveis de ambiente:
+1. instale os pacotes necessários rodando:
+`npm install`
+2 Configure as seguintes variáveis de ambiente:
 `DATABASE_URL=postgresql://{usuario}:{senha}@localhost:5432/{nome_do_banco}`
 substitua os valores em chaves pelos valores correspondentes
+3 Suba o schema da base de dados (garanta que o psql esteja rodando):
+`npx drizzle-kit push`
+4 Rode o servidor backend com: `npx run dev-backend`
+5 Rode a interface web com `npx run dev`
+
 
 # Desafio Fullstack – Plataforma de Tarefas (To-Do List)
 ## Objetivo

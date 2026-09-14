@@ -1,17 +1,28 @@
 import { Router } from "express";
-import { tasksQuerySchemaType, taskByIdSchema, tasksQuerySchema } from "./task.schema";
-import z from "zod";
+import { taskByIdSchema, tasksQuerySchema } from "./task.schema";
+import { tasksService } from "./task.service";
+
 export const taskRouter = Router();
 
-taskRouter.get("/tasks/",(req,res)=>{
-    const query = tasksQuerySchema.safeParse(req.query)
+taskRouter.get("/tasks/", async (req, res, next) => {
+  try {
+    const { status, search } = tasksQuerySchema.parse(req.query);
+    const result = await tasksService.queryTasks(search, status);
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+});
 
-    if(!query.success){
-      throw new Error('validation Error')
+taskRouter.get("/tasks/:id", async (req, res, next) => {
+  try {
+    const { id } = taskByIdSchema.parse(req.params);
+    const result = await tasksService.queryById(id);
+    if (result.length == 0) {
+      return res.status(404).json({ message: "task not found" });
     }
-    q
-})
-taskRouter.get("tasks/:taskId", (req, res) => {
-  const { taskId } = req.params;
-  task
+    return res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
 });
