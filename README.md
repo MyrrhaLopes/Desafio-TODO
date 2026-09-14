@@ -7,6 +7,14 @@
 - Tanstack Router: Roteamento de front-end para visualizações baseada em url,
 - Tanstack Query: caching e revalidação inteligentes pro front-end,
 
+# Passo-a-passo para instalar e rodar localmente:
+instale os pacotes necessários rodando:
+`npm install`
+
+configure as seguintes variáveis de ambiente:
+`DATABASE_URL=postgresql://{usuario}:{senha}@localhost:5432/{nome_do_banco}`
+substitua os valores em chaves pelos valores correspondentes
+
 # Desafio Fullstack – Plataforma de Tarefas (To-Do List)
 ## Objetivo
 - Criar uma aplicação web completa que permita usuários se cadastrarem, autenticarem, e gerenciarem uma lista de tarefas.
@@ -108,3 +116,4 @@ O candidato deve entregar:
 
 
 **CC:** rhaiany_souza@id.uff.br
+

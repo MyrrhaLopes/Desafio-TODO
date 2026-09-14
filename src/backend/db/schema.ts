@@ -2,14 +2,16 @@ import {
   pgTable,
   serial,
   text,
-  boolean,
   timestamp,
-  integer,
   uuid,
   pgEnum,
 } from "drizzle-orm/pg-core";
 
-const todoStatusEnum = pgEnum("todo_status", ["done", "to-do", "in-progress"]);
+export const todoStatusEnum = pgEnum("todo_status", [
+  "done",
+  "to-do",
+  "in-progress",
+]);
 
 export const usersTable = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -25,4 +27,6 @@ export const todosTable = pgTable("todos", {
   dueDateStart: timestamp("due_date_start"),
   dueDateEnd: timestamp("due_date_end"),
   status: todoStatusEnum("status").default("to-do"),
+  createdAt: timestamp("create_at").defaultNow(),
+  userId: serial("user_id").references(() => usersTable.id),
 });
