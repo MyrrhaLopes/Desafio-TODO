@@ -6,7 +6,7 @@ const app = express();
 
 app.use(express.json()); //parseia a sequência de bytes como json em toda requisição
 
-app.use("/todos", taskRouter);
+app.use(taskRouter);
 
 // error handler global vai no final, depois de todas as rotas
 app.use(errorHandler);
