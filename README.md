@@ -22,6 +22,11 @@ substitua os valores em chaves pelos valores correspondentes
 4 Rode o servidor backend com: `npx run dev-backend`
 5 Rode a interface web com `npx run dev`
 
+# Sobre o uso de inteligência Artificial
+A IA foi utilizada como auxiliadora no processo de implementação de certas features, assim como auxiliar em debugar erros e considerar opções de implementações. Alguns casos:
+- Ajudou a familiarizar-me com as frameworks e bibliotecas utilizadas através da aplicação, respondendo dúvidas pontuais
+- Ajudou a construir, de forma guiada, os componentes e páginas do Frontend da aplicação a partir do Design do Figma
+- 
 
 # Desafio Fullstack – Plataforma de Tarefas (To-Do List)
 ## Objetivo
