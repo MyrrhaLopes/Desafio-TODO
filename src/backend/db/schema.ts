@@ -12,7 +12,7 @@ export const todoStatusEnum = pgEnum("todo_status", [
   "to-do",
   "in-progress",
 ]);
-
+export type TodoStatus = (typeof todoStatusEnum.enumValues)[number];
 export const usersTable = pgTable("users", {
   id: serial("id").primaryKey(),
   email: text("email").notNull().unique(),
@@ -20,7 +20,7 @@ export const usersTable = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const todosTable = pgTable("todos", {
+export const TasksTable = pgTable("tasks", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: text("title").notNull(),
   description: text("description"),
