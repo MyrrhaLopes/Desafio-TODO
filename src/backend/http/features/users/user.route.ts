@@ -1,4 +1,6 @@
 import { Router } from "express";
+
+export const userRouter = Router();
 import { userRegisterSchema } from "./user.schema";
 import { USER_SERVICE } from "./user.service";
 
