@@ -2,7 +2,7 @@ import { and, eq, ilike, or } from "drizzle-orm";
 import { db } from "../../../db/drizzle";
 import { TasksTable, type TodoStatus } from "../../../db/schema";
 
-export const tasksService = {
+export const TASK_SERVICE = {
   queryTasks: async (query?: string, status?: TodoStatus) => {
     return db
       .select()
