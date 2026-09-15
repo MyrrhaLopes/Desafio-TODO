@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   pgTable,
   serial,
@@ -5,6 +6,7 @@ import {
   timestamp,
   uuid,
   pgEnum,
+  integer,
 } from "drizzle-orm/pg-core";
 
 export const taskStatusEnum = pgEnum("todo_status", [
@@ -19,7 +21,12 @@ export const usersTable = pgTable("users", {
   passwordHash: text("password_hash").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
-
+export const sessionsTable = pgTable("sessions",{
+  id:uuid('id').primaryKey().defaultRandom(),
+  userId: integer("user_id").references(()=>usersTable.id).notNull(),
+  expiresAt: timestamp("expires_at").notNull().default(sql`now() + interval '7 days'`),
+  createdAt: timestamp('created_at').notNull().defaultNow()
+})
 export const TasksTable = pgTable("tasks", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: text("title").notNull(),

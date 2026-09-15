@@ -10,6 +10,7 @@ lerna-debug.log*
 node_modules
 docs/notas.md
 docs/duvidas.md
+docs/duvidas/*
 dist
 dist-ssr
 *.local
