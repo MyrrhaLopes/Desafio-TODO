@@ -1,3 +1,14 @@
+
+
+# Todos:
+- [ ] Definir páginas principais com filtros de url
+- [ ] Definir estrutura ideal de componentes react
+- [ ] Definir hooks com querys com cache
+- [ ] Definir rotas e serviço de login
+- [ ] Definir middleware de autenticação com cookie sessions
+- [ ] Definir autenticação nas rotas
+- [ ] Terminar rotas de CRUD de tarefas
+
 # Tecnologias utilizadas:
 - React: frontend declarativo
 - Postgres: banco de dados relacional
@@ -21,6 +32,13 @@ substitua os valores em chaves pelos valores correspondentes
 `npx drizzle-kit push`
 4 Rode o servidor backend com: `npx run dev-backend`
 5 Rode a interface web com `npx run dev`
+
+# Estrutura de pastas:
+frontend
+    components: pasta em que ficam pastas por feature de domínio (como task, user)
+        ui: componentes de ui sem conhecimento de domínio (como button.tsx)
+    hooks: hooks utilizados através dos componentes da aplicação. não separados por pasta somente por arquivo
+    shared: funções, handlers, constantes compartilhados através do front-end que não se encaixam nas pastas acima
 
 # Sobre o uso de inteligência Artificial
 A IA foi utilizada como auxiliadora no processo de implementação de certas features, assim como auxiliar em debugar erros e considerar opções de implementações. Alguns casos:
