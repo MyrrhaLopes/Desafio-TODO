@@ -3,19 +3,20 @@ import z, { ZodError } from "zod";
 
 export function errorHandler(
   err: Error,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction,
-): { status: "fail"; message: string; errors?: Record<string, any> } {
+  _next: NextFunction,
+): void {
   if (err instanceof ZodError) {
-    return {
+    res.status(400).json({
       status: "fail",
-      message: err.message,
+      message: "Validation error",
       errors: z.flattenError(err),
-    };
+    });
+    return;
   }
-  return {
+  res.status(500).json({
     status: "fail",
     message: `the server didn't behaved correctly`,
-  };
+  });
 }
