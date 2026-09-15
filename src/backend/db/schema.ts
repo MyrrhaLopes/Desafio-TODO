@@ -15,18 +15,25 @@ export const taskStatusEnum = pgEnum("todo_status", [
   "in-progress",
 ]);
 export type TodoStatus = (typeof taskStatusEnum.enumValues)[number];
+
 export const usersTable = pgTable("users", {
   id: serial("id").primaryKey(),
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
-export const sessionsTable = pgTable("sessions",{
-  id:uuid('id').primaryKey().defaultRandom(),
-  userId: integer("user_id").references(()=>usersTable.id).notNull(),
-  expiresAt: timestamp("expires_at").notNull().default(sql`now() + interval '7 days'`),
-  createdAt: timestamp('created_at').notNull().defaultNow()
-})
+export type UserInsert = typeof TasksTable.$inferSelect;
+
+export const sessionsTable = pgTable("sessions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: integer("user_id")
+    .references(() => usersTable.id)
+    .notNull(),
+  expiresAt: timestamp("expires_at")
+    .notNull()
+    .default(sql`now() + interval '7 days'`),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
 export const TasksTable = pgTable("tasks", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: text("title").notNull(),

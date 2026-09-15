@@ -15,6 +15,7 @@ export function errorHandler(
     });
     return;
   }
+  console.log(err);
   res.status(500).json({
     status: "fail",
     message: `the server didn't behaved correctly`,

@@ -1,12 +1,12 @@
 
 
 # Todos:
-- [ ] Definir páginas principais com filtros de url
-- [ ] Definir estrutura ideal de componentes react
+- [/] Definir páginas principais com filtros de url
+- [/] Definir estrutura ideal de componentes react
 - [ ] Definir hooks com querys com cache
-- [ ] Definir rotas e serviço de login
-- [ ] Definir middleware de autenticação com cookie sessions
-- [ ] Definir autenticação nas rotas
+- [x] Definir rotas e serviço de login
+- [x] Definir middleware de autenticação com cookie sessions
+- [ ] Definir proteção de rotas do front e tratamentos de erros de estado do servidor
 - [ ] Terminar rotas de CRUD de tarefas
 
 # Tecnologias utilizadas:
