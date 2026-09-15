@@ -7,12 +7,12 @@ import {
   pgEnum,
 } from "drizzle-orm/pg-core";
 
-export const todoStatusEnum = pgEnum("todo_status", [
+export const taskStatusEnum = pgEnum("todo_status", [
   "done",
   "to-do",
   "in-progress",
 ]);
-export type TodoStatus = (typeof todoStatusEnum.enumValues)[number];
+export type TodoStatus = (typeof taskStatusEnum.enumValues)[number];
 export const usersTable = pgTable("users", {
   id: serial("id").primaryKey(),
   email: text("email").notNull().unique(),
@@ -26,7 +26,7 @@ export const TasksTable = pgTable("tasks", {
   description: text("description"),
   dueDateStart: timestamp("due_date_start"),
   dueDateEnd: timestamp("due_date_end"),
-  status: todoStatusEnum("status").default("to-do"),
+  status: taskStatusEnum("status").default("to-do"),
   createdAt: timestamp("create_at").defaultNow(),
   userId: serial("user_id").references(() => usersTable.id),
 });
