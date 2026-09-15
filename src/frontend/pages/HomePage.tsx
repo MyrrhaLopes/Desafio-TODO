@@ -6,9 +6,8 @@ import { TaskView } from "@/frontend/components/task/TaskView";
 import z from "zod";
 import { taskStatusEnum } from "@/backend/db/schema";
 import { TASK_VIEW_OPTIONS, TASK_GROUPING_OPTIONS, TASK_PRAZO_OPTIONS } from "@/frontend/components/task/task-options";
-import { useQuery } from "@tanstack/react-query";
 import { useSearch } from "@tanstack/react-router";
-import { fetchTasks } from "@/frontend/api/tasks";
+import useGetTask from "../hooks/useGetTask";
 
 const homeSearchSchema = z.object({
   dueDateStart: z.coerce.date().optional(),
@@ -30,10 +29,7 @@ export type HomeSearch = z.infer<typeof homeSearchSchema>;
 export function HomePage() {
   const { status, search, view } = useSearch({ from: "/" });
 
-  const { data: tasks = [], isLoading } = useQuery({
-    queryKey: ["tasks", { status, search }],
-    queryFn: () => fetchTasks({ status, search }),
-  });
+  const { data: tasks = [], isLoading } = useGetTask({ status, search })
 
   return (
     <div className="min-h-screen bg-white">

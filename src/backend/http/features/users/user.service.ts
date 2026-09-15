@@ -26,8 +26,8 @@ export const USER_SERVICE = {
       .select()
       .from(usersTable)
       .where(eq(usersTable.email, email));
-    if (u.length != 0) {
-      throw new Error("user already exists");
+    if (u.length == 0) {
+      throw new Error("user not found");
     }
     const [user] = u
     if(await bcrypt.compare(password,user.passwordHash)==false){

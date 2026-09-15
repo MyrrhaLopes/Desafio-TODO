@@ -12,5 +12,5 @@ export const userRegisterSchema = z.object({
     .regex(/[^A-Za-z0-9]/, "Precisa de pelo menos um caractere especial"),
 });
 
-
 export type UserRegisterInput = z.infer<typeof userRegisterSchema>;
+export type UserLoginInput = z.infer<typeof userRegisterSchema>;

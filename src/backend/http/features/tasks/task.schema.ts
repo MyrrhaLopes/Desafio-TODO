@@ -9,3 +9,7 @@ export type tasksQuerySchemaType = z.infer<typeof tasksQuerySchema>;
 export const taskByIdSchema = z.object({
   id: z.uuid(),
 });
+
+export const postTaskBody = z.object({
+
+})
