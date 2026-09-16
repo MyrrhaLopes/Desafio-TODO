@@ -18,3 +18,12 @@ export const postTaskBody = z.object({
   status: z.enum(taskStatusEnum.enumValues),
 });
 export type PostTaskBody = z.infer<typeof postTaskBody>;
+
+export const patchTaskBody = z.object({
+  title: z.string().max(72).optional(),
+  description: z.string().optional(),
+  dueDateStart: z.coerce.date().optional().nullable(),
+  dueDateEnd: z.coerce.date().optional().nullable(),
+  status: z.enum(taskStatusEnum.enumValues).optional(),
+});
+export type PatchTaskBody = z.infer<typeof patchTaskBody>;

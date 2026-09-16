@@ -8,7 +8,7 @@ type UseGetTaskParams = Omit<tasksQuerySchemaType, "status"> & { status?: tasksQ
 export default function useGetTask({ status, search }: UseGetTaskParams) {
   const { data: user } = useAuth()
   return useQuery({
-    queryKey: ['tasks', user?.userId, status, search],
+    queryKey: ['tasks', user?.id, status, search],
     queryFn: () => fetchTasks({
       status: status === "all" ? undefined : status,
       search,

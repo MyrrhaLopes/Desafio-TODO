@@ -1,9 +1,14 @@
 import { useState, useRef, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import { Clock, ArrowRight } from "lucide-react";
-import { Checkbox } from "@/frontend/components/ui/checkbox";
 import { cn } from "@/frontend/shared/utils";
 import usePostTask from "@/frontend/hooks/usePostTask";
+
+function StaticCheckbox() {
+  return (
+    <div className="w-5 h-5 shrink-0 rounded-sm border-2 border-neutral-300 bg-white" />
+  );
+}
 
 export function NewTaskFormBar() {
   const [title, setTitle] = useState("");
@@ -53,7 +58,7 @@ export function NewTaskFormBar() {
     return (
       <div className="w-full rounded-2xl border border-neutral-300 bg-white shadow-sm">
         <div className="flex items-start gap-3 px-4 pt-4 pb-2">
-          <Checkbox className="mt-1 shrink-0" />
+          <StaticCheckbox />
           <div className="flex-1 min-w-0">
             <input
               ref={titleRef}
@@ -111,7 +116,7 @@ export function NewTaskFormBar() {
 
   return (
     <div className="w-full rounded-full border border-neutral-300 bg-white shadow-sm flex items-center px-3 py-2 gap-2">
-      <Checkbox className="shrink-0" />
+      <StaticCheckbox />
       <input
         ref={titleRef}
         value={title}

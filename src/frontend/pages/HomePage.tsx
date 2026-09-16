@@ -29,19 +29,19 @@ export type HomeSearch = z.infer<typeof homeSearchSchema>;
 export function HomePage() {
   const { status, search, view } = useSearch({ from: "/" });
 
-  const { data: tasks = [], isLoading } = useGetTask({ status, search })
+  const { data: tasks = [], isLoading } = useGetTask({ status, search });
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#f8f8f8]">
       <header className="h-12 bg-neutral-800" />
 
-      <main className="mx-auto max-w-5xl px-6 py-8 space-y-8">
+      <main className="mx-auto max-w-4xl px-6 py-8 space-y-6">
         <NewTaskFormBar />
 
-        <section>
+        <section className="bg-white border border-neutral-200 rounded-xl px-4 py-3">
           <p className="text-sm font-semibold text-neutral-700 mb-3">Opções</p>
           <OptionsBar />
         </section>
-        {/*TODO: melhorar loading com ui optimistica*/}
+
         {isLoading ? (
           <p className="text-sm text-neutral-400">Carregando tarefas...</p>
         ) : (

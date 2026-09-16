@@ -1,4 +1,4 @@
-import { Filter, Tag, LayoutGrid, Clock, Check, X } from "lucide-react";
+import { Filter, Tag, LayoutGrid, Check, X } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,

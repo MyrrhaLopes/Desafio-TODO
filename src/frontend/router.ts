@@ -3,8 +3,9 @@ import { rootRoute } from "./rootRoute";
 import { homeRoute } from "./pages/HomePage";
 import { loginRoute } from "./pages/LoginPage";
 import { registerRoute } from "./pages/RegisterPage";
+import { taskRoute } from "./pages/TaskPage";
 
-const routeTree = rootRoute.addChildren([homeRoute, loginRoute, registerRoute]);
+const routeTree = rootRoute.addChildren([homeRoute, loginRoute, registerRoute, taskRoute]);
 
 export const router = createRouter({
   routeTree,
