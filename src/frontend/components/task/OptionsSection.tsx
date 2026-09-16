@@ -145,7 +145,6 @@ function FiltroButtons({
           <DropdownMenuContent>
             <DropdownMenuItem onClick={() => set({ status: "to-do" })}>Pendente</DropdownMenuItem>
             <DropdownMenuItem onClick={() => set({ status: "done" })}>Concluída</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => set({ status: "in-progress" })}>Em progresso</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         {statusAtivo && (

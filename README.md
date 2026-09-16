@@ -1,38 +1,43 @@
-
-
-# Todos:
-- [/] Definir páginas principais com filtros de url
+# Todos
+- [x] Definir páginas principais com filtros de url
 - [/] Definir estrutura ideal de componentes react
-- [ ] Definir hooks com querys com cache
+- [x] Definir hooks com querys com cache
 - [x] Definir rotas e serviço de login
 - [x] Definir middleware de autenticação com cookie sessions
-- [ ] Definir proteção de rotas do front e tratamentos de erros de estado do servidor
-- [ ] Terminar rotas de CRUD de tarefas
+- [x] Definir proteção de rotas do front e tratamentos de erros de estado do servidor
+- [x] Terminar rotas de CRUD de tarefas
 
-# Tecnologias utilizadas:
-- React: frontend declarativo
+# Descrição geral
+## Objetivo do projeto
+O projeto tem como objetivo oferecer uma interface simplificada mas moderna para cadastro e controle de tarefas to-do, com autenticação e autorização de usuário.
+
+## Tecnologias utilizadas:
+- React: Frontend declarativo
 - ShadCN: biblioteca de componentes com suporte ao teclado e estilo padronizado
 - Postgres: banco de dados relacional
 - Drizzle: ORM (facilitar migrations, declaração de schema da db em typescript com tipagem automática),
 - Express: criação de rotas e middlewares,
 - Zod: validação com conversão de atributos de payload de requisição,
-- Tanstack Router: Roteamento de front-end para visualizações baseada em url,
+- Tanstack Router: Roteamento de front-end para visualizações baseada em url e proteção de de páginas,
 - Tanstack Query: caching e revalidação inteligentes pro front-end,
-
 
 # Passo-a-passo para instalar e rodar localmente:
 REQUISITOS:
-- ter o psql instalado;
-- ter o node instalado
+- ter o psql (PostgreSQL) 18.4 instalado;
+- ter o node v22.23.1 instalado
 
 1. instale os pacotes necessários rodando:
 `npm install`
-2 Configure as seguintes variáveis de ambiente:
+
+2 Configure as seguintes variáveis de ambiente em `.env` na raiz do projeto:
 `DATABASE_URL=postgresql://{usuario}:{senha}@localhost:5432/{nome_do_banco}`
 substitua os valores em chaves pelos valores correspondentes
+
 3 Suba o schema da base de dados (garanta que o psql esteja rodando):
 `npx drizzle-kit push`
+
 4 Rode o servidor backend com: `npx run dev-backend`
+
 5 Rode a interface web com `npx run dev`
 
 # Estrutura de pastas:
@@ -115,11 +120,12 @@ src/
 ```
 
 # Sobre o uso de inteligência Artificial
-A IA foi utilizada como auxiliadora no processo de implementação de certas features, assim como auxiliar em debugar erros e considerar opções de implementações. Alguns casos:
+A IA foi utilizada como auxiliadora no processo de implementação de certas features, assim como auxiliar em debugar erros e considerar opções de implementações. A principal ferramenta de IA utilizada foi o claude-code e o AI Mode da Google para buscas rápidas. Alguns casos de uso:
 - Ajudou a familiarizar-me com as frameworks e bibliotecas utilizadas através da aplicação, respondendo dúvidas pontuais
 - Ajudou a construir, de forma guiada, os componentes e páginas do Frontend da aplicação a partir do Design feito a mão no Figma
 - Ajudou a escrever partes do README
-- Implementou páginas e componentes React responsivos
+- Implementou componentes React responsivos
+- Implementou rotas e services específicos
 
 # Desafio Fullstack – Plataforma de Tarefas (To-Do List)
 ## Objetivo
