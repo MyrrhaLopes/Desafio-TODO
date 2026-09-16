@@ -38,7 +38,7 @@ substitua os valores em chaves pelos valores correspondentes. nome_do_banco diz 
 
 4 Rode o servidor backend com: `npm run dev-backend`
 
-5 Rode a interface web com `npm run dev`
+5 Em outro terminal, rode a interface web com `npm run dev`
 
 # Estrutura de pastas:
 
