@@ -36,9 +36,9 @@ substitua os valores em chaves pelos valores correspondentes
 3 Suba o schema da base de dados (garanta que o psql esteja rodando):
 `npx drizzle-kit push`
 
-4 Rode o servidor backend com: `npx run dev-backend`
+4 Rode o servidor backend com: `npm run dev-backend`
 
-5 Rode a interface web com `npx run dev`
+5 Rode a interface web com `npm run dev`
 
 # Estrutura de pastas:
 
