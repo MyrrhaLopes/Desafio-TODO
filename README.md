@@ -11,12 +11,14 @@
 
 # Tecnologias utilizadas:
 - React: frontend declarativo
+- ShadCN: biblioteca de componentes com suporte ao teclado e estilo padronizado
 - Postgres: banco de dados relacional
 - Drizzle: ORM (facilitar migrations, declaração de schema da db em typescript com tipagem automática),
 - Express: criação de rotas e middlewares,
 - Zod: validação com conversão de atributos de payload de requisição,
 - Tanstack Router: Roteamento de front-end para visualizações baseada em url,
 - Tanstack Query: caching e revalidação inteligentes pro front-end,
+
 
 # Passo-a-passo para instalar e rodar localmente:
 REQUISITOS:
@@ -34,17 +36,90 @@ substitua os valores em chaves pelos valores correspondentes
 5 Rode a interface web com `npx run dev`
 
 # Estrutura de pastas:
-frontend
-    components: pasta em que ficam pastas por feature de domínio (como task, user)
-        ui: componentes de ui sem conhecimento de domínio (como button.tsx)
-    hooks: hooks utilizados através dos componentes da aplicação. não separados por pasta somente por arquivo
-    shared: funções, handlers, constantes compartilhados através do front-end que não se encaixam nas pastas acima
+
+O projeto utiliza uma estrutura monorepo com frontend e backend dentro da mesma pasta `src/`:
+
+```
+src/
+├── main.tsx                  # Ponto de entrada da aplicação React
+├── App.tsx                   # Componente raiz que inicializa o Tanstack Router
+├── index.css                 # Estilos globais (Tailwind CSS)
+│
+├── backend/
+│   ├── server.ts             # Inicializa e sobe o servidor HTTP (Express)
+│   ├── app.ts                # Configura o app Express: middlewares, rotas e error handler
+│   │
+│   ├── db/
+│   │   ├── drizzle.ts        # Conexão com o banco de dados via Drizzle ORM
+│   │   ├── schema.ts         # Definição das tabelas (users, tasks e sessions) com Drizzle
+│   │   └── migrations/       # Arquivos SQL gerados automaticamente pelo Drizzle Kit
+│   │
+│   └── http/
+│       ├── features/         # Organização por feature/domínio
+│       │   ├── tasks/
+│       │   │   ├── task.route.ts    # Rotas HTTP do CRUD de tarefas
+│       │   │   ├── task.schema.ts   # Schemas Zod de validação dos payloads de tarefas
+│       │   │   └── task.service.ts  # Lógica de negócio e queries de tarefas no banco
+│       │   └── users/
+│       │       ├── user.route.ts    # Rotas HTTP de cadastro e login de usuários
+│       │       ├── user.schema.ts   # Schemas Zod de validação dos payloads de usuários
+│       │       └── user.service.ts  # Lógica de negócio de usuários (hash de senha, autenticação)
+│       │
+│       └── middleware/
+│           ├── authorizeUser.ts            # Middleware que valida o cookie de sessão e protege rotas
+│           └── errorHandler.middleware.ts  # Handler global de erros do Express
+│
+├── frontend/
+│   ├── router.ts             # Configuração das rotas do Tanstack Router
+│   ├── rootRoute.tsx         # Rota raiz: layout base e verificação de autenticação
+│   │
+│   ├── api/                  # Funções de chamada HTTP ao backend (fetch wrappers)
+│   │   ├── tasks.ts          # Chamadas de API para o CRUD de tarefas
+│   │   └── users.ts          # Chamadas de API para login e cadastro de usuários
+│   │
+│   ├── components/
+│   │   ├── task/             # Componentes de domínio de tarefas
+│   │   │   ├── TaskView.tsx        # Componente principal que exibe a lista de tarefas
+│   │   │   ├── TaskGroup.tsx       # Agrupa tarefas por status (pendentes/concluídas)
+│   │   │   ├── TaskCard.tsx        # Card individual de uma tarefa com ações
+│   │   │   ├── NewTaskFormBar.tsx  # Barra com formulário para criação de nova tarefa
+│   │   │   ├── OptionsBar.tsx      # Barra de opções de filtro e ordenação
+│   │   │   ├── OptionsSection.tsx  # Seção expansível de opções da barra
+│   │   │   └── task-options.ts     # Constantes de configuração das opções de filtro/ordenação
+│   │   │
+│   │   └── ui/               # Componentes de UI genéricos (shadcn/ui), sem lógica de domínio
+│   │       ├── button.tsx
+│   │       ├── card.tsx
+│   │       ├── checkbox.tsx
+│   │       ├── dropdown-menu.tsx
+│   │       ├── input.tsx
+│   │       └── label.tsx
+│   │
+│   ├── hooks/                # Hooks React que encapsulam queries e mutações do Tanstack Query
+│   │   ├── useAuth.ts          # Hook de estado de autenticação do usuário
+│   │   ├── useGetTask.ts       # Hook de busca das tarefas do usuário (com cache)
+│   │   ├── usePostTask.ts      # Hook de mutação para criação de tarefas
+│   │   ├── useLoginUser.ts     # Hook de mutação para login
+│   │   └── useRegisterUser.ts  # Hook de mutação para cadastro de usuário
+│   │
+│   ├── pages/                # Componentes de página (montados pelo router)
+│   │   ├── HomePage.tsx      # Página principal com a lista de tarefas
+│   │   ├── LoginPage.tsx     # Página de login
+│   │   └── RegisterPage.tsx  # Página de cadastro
+│   │
+│   └── shared/
+│       └── utils.ts          # Utilitários compartilhados (ex: helper `cn` para classes Tailwind)
+│
+└── types/
+    └── express.d.ts          # Extensão de tipos do Express (ex: adiciona `user` ao objeto `Request`)
+```
 
 # Sobre o uso de inteligência Artificial
 A IA foi utilizada como auxiliadora no processo de implementação de certas features, assim como auxiliar em debugar erros e considerar opções de implementações. Alguns casos:
 - Ajudou a familiarizar-me com as frameworks e bibliotecas utilizadas através da aplicação, respondendo dúvidas pontuais
-- Ajudou a construir, de forma guiada, os componentes e páginas do Frontend da aplicação a partir do Design do Figma
-- 
+- Ajudou a construir, de forma guiada, os componentes e páginas do Frontend da aplicação a partir do Design feito a mão no Figma
+- Ajudou a escrever partes do README
+- Implementou páginas e componentes React responsivos
 
 # Desafio Fullstack – Plataforma de Tarefas (To-Do List)
 ## Objetivo
