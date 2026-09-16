@@ -9,7 +9,7 @@ taskRouter.get("/tasks/", authorizeUser, async (req, res, next) => {
   try {
     const { status, search } = tasksQuerySchema.parse(req.query);
     const result = await TASK_SERVICE.queryTasks(req.user!.id, search, status);
-    res.json(result);
+    res.status(200).json(result);
   } catch (err) {
     next(err);
   }

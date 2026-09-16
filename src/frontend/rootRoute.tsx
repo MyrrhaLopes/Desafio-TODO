@@ -1,5 +1,4 @@
 import { createRootRouteWithContext, Outlet, redirect } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import type { UserInsert } from "@/backend/db/schema";
 
 export type AuthContext = {
@@ -18,7 +17,6 @@ export const rootRoute = createRootRouteWithContext<{ auth: AuthContext }>()({
   component: () => (
     <>
       <Outlet />
-      <TanStackRouterDevtools />
     </>
   ),
 });
