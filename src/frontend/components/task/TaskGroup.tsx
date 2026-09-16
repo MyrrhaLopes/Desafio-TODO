@@ -17,6 +17,9 @@ interface TaskGroupProps {
   columns?: { time: string; tasks: Task[] }[];
 }
 
+const CARD_COLUMN_WIDTH = 208; // w-52, shared between grid and time columns
+const SECTION_CONTENT_HEIGHT = 288; // matches design reference
+
 function GridTaskGroup({ label, tasks, showSeeMore }: { label: string; tasks: Task[]; showSeeMore?: boolean }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [maskLeft, setMaskLeft] = useState(false);
@@ -68,21 +71,30 @@ function GridTaskGroup({ label, tasks, showSeeMore }: { label: string; tasks: Ta
 
         <div
           ref={scrollRef}
-          className="overflow-x-auto pb-1 scrollbar-none"
+          className="overflow-x-auto"
           style={{ scrollbarWidth: "none" }}
         >
+          {/* flex-direction: column + flex-wrap: wrap fills tasks downward first,
+              then overflows into new columns to the right when height is exceeded */}
           <div
-            className="grid gap-x-4 gap-y-2 w-fit min-w-full"
-            style={{ gridTemplateColumns: "repeat(2, minmax(220px, 1fr))" }}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              flexWrap: "wrap",
+              alignContent: "flex-start",
+              height: `${SECTION_CONTENT_HEIGHT}px`,
+              gap: "8px",
+            }}
           >
             {tasks.map((task) => (
-              <TaskCard
-                key={task.id}
-                id={task.id}
-                title={task.title}
-                description={task.description}
-                completed={task.completed}
-              />
+              <div key={task.id} style={{ width: `${CARD_COLUMN_WIDTH}px`, flexShrink: 0 }}>
+                <TaskCard
+                  id={task.id}
+                  title={task.title}
+                  description={task.description}
+                  completed={task.completed}
+                />
+              </div>
             ))}
           </div>
         </div>
@@ -152,26 +164,20 @@ function TimeColumnGroup({ label, columns = [], showSeeMore }: Omit<TaskGroupPro
               <div
                 key={col.time}
                 className={cn(
-                  "w-52 shrink-0 border-r border-neutral-200",
+                  "shrink-0 border-r border-neutral-200",
                   colIdx === 0 && "border-l border-neutral-200",
                 )}
+                style={{ width: `${CARD_COLUMN_WIDTH}px` }}
               >
                 <div className="py-2 px-3 text-center text-sm font-semibold text-neutral-700 border-b border-neutral-200">
                   {col.time}
                 </div>
                 <div
-                  className="overflow-y-auto relative"
+                  className="overflow-y-auto"
                   style={{
-                    maxHeight: "320px",
+                    minHeight: `${SECTION_CONTENT_HEIGHT}px`,
+                    maxHeight: `${SECTION_CONTENT_HEIGHT}px`,
                     scrollbarWidth: "none",
-                    maskImage:
-                      col.tasks.length > 3
-                        ? "linear-gradient(to bottom, black 70%, transparent 100%)"
-                        : undefined,
-                    WebkitMaskImage:
-                      col.tasks.length > 3
-                        ? "linear-gradient(to bottom, black 70%, transparent 100%)"
-                        : undefined,
                   }}
                 >
                   <div className="flex flex-col gap-2 p-3">
@@ -188,7 +194,7 @@ function TimeColumnGroup({ label, columns = [], showSeeMore }: Omit<TaskGroupPro
                 </div>
               </div>
             ))}
-            <div className="w-52 shrink-0" />
+            <div style={{ width: `${CARD_COLUMN_WIDTH}px` }} className="shrink-0" />
           </div>
         </div>
       </div>

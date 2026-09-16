@@ -11,6 +11,7 @@ node_modules
 docs/notas.md
 docs/duvidas.md
 docs/duvidas/*
+docs/visual-bugs-screenshots/*
 dist
 dist-ssr
 *.local
