@@ -119,6 +119,37 @@ src/
     └── express.d.ts          # Extensão de tipos do Express (ex: adiciona `user` ao objeto `Request`)
 ```
 
+# Modelagem do Banco de Dados
+
+O banco possui três tabelas principais com os seguintes relacionamentos:
+
+```
+users (id PK) ──< sessions (user_id FK, CASCADE DELETE)
+users (id PK) ──< tasks    (user_id FK, CASCADE DELETE)
+```
+
+Documentação detalhada de cada entidade (modelagem, rotas, funções e segurança):
+
+- [Usuário](docs/entidades/usuario.md) — tabela `users`, cadastro, login e exclusão de conta
+- [Sessão](docs/entidades/sessao.md) — tabela `sessions`, autenticação via cookie httpOnly e middleware `authorizeUser`
+- [Tarefa](docs/entidades/tarefa.md) — tabela `tasks`, CRUD completo com isolamento por usuário
+
+O schema completo com anotações está em [`src/backend/db/schema.ts`](src/backend/db/schema.ts).
+
+# Segurança Aplicada
+
+| Medida | Como foi implementada |
+| --- | --- |
+| **Hash de senhas** | bcrypt com salt factor 10 — a senha nunca é armazenada em texto puro |
+| **Proteção de rotas** | Middleware `authorizeUser` valida o cookie de sessão antes de qualquer rota privada |
+| **Sessão stateful via cookie httpOnly** | O token de sessão (UUID) é enviado num cookie `httpOnly`, inacessível a JavaScript no browser, mitigando XSS |
+| **Cookie `sameSite: lax`** | Reduz a superfície de ataques CSRF em navegação cruzada |
+| **Expiração server-side** | Validade de 7 dias calculada e verificada no banco — invalidar a sessão no servidor encerra o acesso imediatamente |
+| **Isolamento por usuário** | Todas as queries de tarefa incluem `userId` como filtro — um usuário não consegue ler, editar ou deletar tarefas de outro mesmo conhecendo o UUID |
+| **Validação de input** | Zod valida e coerce todos os payloads antes de qualquer acesso ao banco |
+| **Proteção contra SQL Injection** | Drizzle ORM usa queries parametrizadas — não há interpolação de strings em SQL |
+| **Sem exposição do hash** | `password_hash` nunca é retornado nas respostas da API |
+
 # Sobre o uso de inteligência Artificial
 A IA foi utilizada como auxiliadora no processo de implementação de certas features, assim como auxiliar em debugar erros e considerar opções de implementações. A principal ferramenta de IA utilizada foi o claude-code e o AI Mode da Google para buscas rápidas. Alguns casos de uso:
 - Ajudou a familiarizar-me com as frameworks e bibliotecas utilizadas através da aplicação, respondendo dúvidas pontuais
