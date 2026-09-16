@@ -12,6 +12,9 @@ import {
   CardTitle,
 } from "@/frontend/components/ui/card";
 import useLoginUser from "../hooks/useLoginUser";
+import { useQueryClient } from "@tanstack/react-query";
+import useAuth from "../hooks/useAuth";
+import { useEffect } from "react";
 
 export const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -22,10 +25,26 @@ export const loginRoute = createRoute({
 export function LoginPage() {
   const { mutate, isPending, error } = useLoginUser();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { data: user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      navigate({ to: '/' });
+    }
+  }, [user]);
+
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
     const form = new FormData(e.currentTarget);
-    mutate({ email: form.get('email') as string, password: form.get('password') as string }, { onSuccess: () => { navigate({ to: '/' }) } })
+    mutate(
+      { email: form.get('email') as string, password: form.get('password') as string },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['auth', 'current_user'] });
+        }
+      }
+    )
   }
 
   return (

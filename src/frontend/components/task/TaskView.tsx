@@ -79,10 +79,12 @@ function TaskListView({ tasks }: { tasks: TasksSelect[] }) {
           timeGroups.get(timeKey)!.tasks.push(task);
         }
 
-        const columns = Array.from(timeGroups.values()).map((tg) => ({
-          time: tg.timeLabel,
-          tasks: tg.tasks.map(toCardTask),
-        }));
+        const columns = Array.from(timeGroups.values())
+          .sort((a, b) => a.timeLabel.localeCompare(b.timeLabel))
+          .map((tg) => ({
+            time: tg.timeLabel,
+            tasks: tg.tasks.map(toCardTask),
+          }));
 
         if (columns.length === 1 && !columns[0].time) {
           return (
