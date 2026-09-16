@@ -8,6 +8,9 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+.env
+.env.*
+!.env.example
 docs/notas.md
 docs/duvidas.md
 docs/duvidas/*
@@ -15,6 +18,7 @@ docs/visual-bugs-screenshots/*
 dist
 dist-ssr
 *.local
+
 
 # Editor directories and files
 .vscode/*

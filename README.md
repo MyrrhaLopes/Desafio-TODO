@@ -31,7 +31,7 @@ REQUISITOS:
 
 2 Configure as seguintes variáveis de ambiente em `.env` na raiz do projeto:
 `DATABASE_URL=postgresql://{usuario}:{senha}@localhost:5432/{nome_do_banco}`
-substitua os valores em chaves pelos valores correspondentes
+substitua os valores em chaves pelos valores correspondentes. nome_do_banco diz respeito ao nome do banco de dados criado a partir do psql com `CREATE DATABASE nome_do_banco;`
 
 3 Suba o schema da base de dados (garanta que o psql esteja rodando):
 `npx drizzle-kit push`
