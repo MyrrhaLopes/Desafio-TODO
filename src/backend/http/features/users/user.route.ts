@@ -53,3 +53,22 @@ userRouter.post("/sessions/", async (req, res, next) => {
 userRouter.get("/sessions/", authorizeUser, (req, res) => {
   return res.status(200).json(req.user);
 });
+
+userRouter.delete("/sessions/", authorizeUser, async (req, res, next) => {
+  try {
+    const sessionId = req.cookies["session_id"];
+    await USER_SERVICE.logoutUser(sessionId);
+    return res.clearCookie("session_id").status(204).send();
+  } catch (err) {
+    next(err);
+  }
+});
+
+userRouter.delete("/users/", authorizeUser, async (req, res, next) => {
+  try {
+    await USER_SERVICE.deleteUser(req.user!.id);
+    return res.clearCookie("session_id").status(204).send();
+  } catch (err) {
+    next(err);
+  }
+});

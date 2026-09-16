@@ -27,7 +27,7 @@ export type UserInsert = typeof usersTable.$inferSelect;
 export const sessionsTable = pgTable("sessions", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: integer("user_id")
-    .references(() => usersTable.id)
+    .references(() => usersTable.id, { onDelete: "cascade" })
     .notNull(),
   expiresAt: timestamp("expires_at")
     .notNull()
@@ -42,7 +42,7 @@ export const TasksTable = pgTable("tasks", {
   dueDateEnd: timestamp("due_date_end"),
   status: taskStatusEnum("status").default("to-do"),
   createdAt: timestamp("create_at").defaultNow(),
-  userId: serial("user_id").references(() => usersTable.id),
+  userId: serial("user_id").references(() => usersTable.id, { onDelete: "cascade" }),
 });
 export type TasksInsert = typeof TasksTable.$inferInsert;
 export type TasksSelect = typeof TasksTable.$inferSelect;

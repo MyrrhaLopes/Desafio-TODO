@@ -14,12 +14,51 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/frontend/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/frontend/components/ui/popover";
+import { DateTimePicker } from "@/frontend/components/task/DateTimePicker";
 
 export const taskRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/tasks/$taskId",
   component: TaskPage,
 });
+
+function formatStoredDate(start: Date, end?: Date | null): string {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  const d = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+
+  let dateLabel: string;
+  if (d.getTime() === today.getTime()) dateLabel = "Hoje";
+  else if (d.getTime() === tomorrow.getTime()) dateLabel = "Amanhã";
+  else dateLabel = start.toLocaleDateString("pt-BR");
+
+  const h = start.getHours();
+  const m = start.getMinutes();
+  if (h === 0 && m === 0) return dateLabel;
+
+  const startTime = start.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+
+  if (end) {
+    const endTime = end.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    return `${dateLabel}, ${startTime}–${endTime}`;
+  }
+
+  return `${dateLabel}, ${startTime}`;
+}
+
+function buildDateWithTime(base: Date, time: string | undefined): Date {
+  const d = new Date(base);
+  if (time) {
+    const [h, m] = time.split(":").map(Number);
+    d.setHours(h, m, 0, 0);
+  } else {
+    d.setHours(0, 0, 0, 0);
+  }
+  return d;
+}
 
 function TaskPage() {
   const { taskId } = useParams({ from: "/tasks/$taskId" });
@@ -31,6 +70,11 @@ function TaskPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [prazoOpen, setPrazoOpen] = useState(false);
+  const [pendingDate, setPendingDate] = useState<Date | undefined>(undefined);
+  const [pendingTimeStart, setPendingTimeStart] = useState<string | undefined>(undefined);
+  const [pendingTimeEnd, setPendingTimeEnd] = useState<string | undefined>(undefined);
+  const [prazoModified, setPrazoModified] = useState(false);
   const initializedRef = useRef(false);
 
   useEffect(() => {
@@ -38,6 +82,21 @@ function TaskPage() {
       initializedRef.current = true;
       setTitle(task.title);
       setDescription(task.description ?? "");
+      if (task.dueDateStart) {
+        const start = new Date(task.dueDateStart as unknown as string);
+        setPendingDate(new Date(start.getFullYear(), start.getMonth(), start.getDate()));
+        const h = start.getHours(), m = start.getMinutes();
+        if (h !== 0 || m !== 0) {
+          setPendingTimeStart(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
+        }
+        if (task.dueDateEnd) {
+          const end = new Date(task.dueDateEnd as unknown as string);
+          const eh = end.getHours(), em = end.getMinutes();
+          if (eh !== 0 || em !== 0) {
+            setPendingTimeEnd(`${String(eh).padStart(2, "0")}:${String(em).padStart(2, "0")}`);
+          }
+        }
+      }
     }
   }, [task]);
 
@@ -67,9 +126,27 @@ function TaskPage() {
 
   const handleSave = () => {
     patch(
-      { id: taskId, values: { title, description: description || undefined } },
+      {
+        id: taskId,
+        values: {
+          title,
+          description: description || undefined,
+          ...(prazoModified && {
+            dueDateStart: pendingDate ? buildDateWithTime(pendingDate, pendingTimeStart) : null,
+            dueDateEnd: pendingDate && pendingTimeEnd ? buildDateWithTime(pendingDate, pendingTimeEnd) : null,
+          }),
+        },
+      },
       { onSuccess: () => navigate({ to: "/" }) },
     );
+  };
+
+  const handleRemovePrazo = () => {
+    setPendingDate(undefined);
+    setPendingTimeStart(undefined);
+    setPendingTimeEnd(undefined);
+    setPrazoModified(true);
+    setPrazoOpen(false);
   };
 
   const handleDelete = () => {
@@ -83,31 +160,30 @@ function TaskPage() {
     });
   };
 
-  const formatDueDate = () => {
-    if (!task.dueDateStart) return null;
-    const d = new Date(task.dueDateStart);
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setDate(now.getDate() + 1);
+  const originalLabel = task.dueDateStart
+    ? formatStoredDate(
+        new Date(task.dueDateStart as unknown as string),
+        task.dueDateEnd ? new Date(task.dueDateEnd as unknown as string) : null,
+      )
+    : null;
 
-    const isTomorrow =
-      d.getDate() === tomorrow.getDate() &&
-      d.getMonth() === tomorrow.getMonth() &&
-      d.getFullYear() === tomorrow.getFullYear();
+  const pendingLabel = (() => {
+    if (!prazoModified || !pendingDate) return null;
+    const start = buildDateWithTime(pendingDate, pendingTimeStart);
+    const end = pendingTimeEnd ? buildDateWithTime(pendingDate, pendingTimeEnd) : null;
+    return formatStoredDate(start, end);
+  })();
 
-    const isToday =
-      d.getDate() === now.getDate() &&
-      d.getMonth() === now.getMonth() &&
-      d.getFullYear() === now.getFullYear();
+  const effectivelyHasDate = prazoModified ? !!pendingDate : !!originalLabel;
 
-    const timeStr = d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-
-    if (isToday) return `Hoje às ${timeStr}`;
-    if (isTomorrow) return `Para amanhã às ${timeStr}`;
-    return `${d.toLocaleDateString("pt-BR")} às ${timeStr}`;
-  };
-
-  const dueDateLabel = formatDueDate();
+  const displayLabel = (() => {
+    if (!prazoModified) return originalLabel;
+    if (pendingDate && pendingLabel) {
+      if (originalLabel) return `De ${originalLabel} para ${pendingLabel}`;
+      return pendingLabel;
+    }
+    return null;
+  })();
 
   return (
     <div className="min-h-screen bg-[#f8f8f8]">
@@ -168,18 +244,45 @@ function TaskPage() {
             </div>
           </div>
 
-          {dueDateLabel && (
-            <div className="flex items-center gap-2 pl-9">
-              <span className="text-sm text-neutral-600">{dueDateLabel}</span>
-              <button
-                type="button"
-                className="flex items-center gap-1 rounded-full border border-neutral-300 bg-white px-3 py-1 text-xs text-neutral-500 hover:bg-neutral-50 transition-colors"
-              >
-                <Clock className="w-3.5 h-3.5" />
-                Mudar prazo
-              </button>
-            </div>
-          )}
+          <div className="flex items-center gap-2 pl-9">
+            {displayLabel ? (
+              <span className="text-sm text-neutral-600">{displayLabel}</span>
+            ) : (
+              <span className="text-sm text-neutral-400">Sem prazo</span>
+            )}
+            <Popover open={prazoOpen} onOpenChange={setPrazoOpen}>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  className="flex items-center gap-1 rounded border border-neutral-300 bg-white px-3 py-1 text-xs text-neutral-500 hover:bg-neutral-50 transition-colors"
+                >
+                  <Clock className="w-3.5 h-3.5" />
+                  {effectivelyHasDate ? "Mudar prazo" : "Definir prazo"}
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-3" align="start">
+                <DateTimePicker
+                  date={pendingDate}
+                  timeStart={pendingTimeStart}
+                  timeEnd={pendingTimeEnd}
+                  onDateChange={(d) => { setPendingDate(d); setPrazoModified(true); }}
+                  onTimeStartChange={(t) => { setPendingTimeStart(t); setPrazoModified(true); }}
+                  onTimeEndChange={(t) => { setPendingTimeEnd(t); setPrazoModified(true); }}
+                />
+                {originalLabel && (
+                  <div className="mt-2 border-t border-neutral-100 pt-2">
+                    <button
+                      type="button"
+                      onClick={handleRemovePrazo}
+                      className="w-full rounded px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 transition-colors text-left"
+                    >
+                      Remover prazo
+                    </button>
+                  </div>
+                )}
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
 
         <div className="rounded-2xl border border-neutral-200 bg-white px-4 py-3 min-h-64">

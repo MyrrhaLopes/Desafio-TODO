@@ -7,6 +7,8 @@ interface Task {
   title: string;
   description?: string;
   completed?: boolean;
+  dueDateStart?: string | null;
+  dueDateEnd?: string | null;
 }
 
 interface TaskGroupProps {
@@ -93,6 +95,8 @@ function GridTaskGroup({ label, tasks, showSeeMore }: { label: string; tasks: Ta
                   title={task.title}
                   description={task.description}
                   completed={task.completed}
+                  dueDateStart={task.dueDateStart}
+                  dueDateEnd={task.dueDateEnd}
                 />
               </div>
             ))}
@@ -100,6 +104,75 @@ function GridTaskGroup({ label, tasks, showSeeMore }: { label: string; tasks: Ta
         </div>
       </div>
     </section>
+  );
+}
+
+function TimeColumn({ col, isFirst }: { col: { time: string; tasks: Task[] }; isFirst: boolean }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [maskBottom, setMaskBottom] = useState(false);
+
+  const checkMask = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const isScrollable = el.scrollHeight > el.clientHeight + 2;
+    const atBottom = el.scrollTop >= el.scrollHeight - el.clientHeight - 8;
+    setMaskBottom(isScrollable && !atBottom);
+  };
+
+  useEffect(() => {
+    checkMask();
+    const el = scrollRef.current;
+    el?.addEventListener("scroll", checkMask);
+    window.addEventListener("resize", checkMask);
+    return () => {
+      el?.removeEventListener("scroll", checkMask);
+      window.removeEventListener("resize", checkMask);
+    };
+  }, [col.tasks]);
+
+  return (
+    <div
+      className={cn(
+        "shrink-0 border-r border-neutral-200",
+        isFirst && "border-l border-neutral-200",
+      )}
+      style={{ width: `${CARD_COLUMN_WIDTH}px` }}
+    >
+      <div className="py-2 px-3 text-center text-sm font-semibold text-neutral-700 border-b border-neutral-200">
+        {col.time}
+      </div>
+      <div className="relative">
+        <div
+          ref={scrollRef}
+          className="overflow-y-auto"
+          style={{
+            minHeight: `${SECTION_CONTENT_HEIGHT}px`,
+            maxHeight: `${SECTION_CONTENT_HEIGHT}px`,
+            scrollbarWidth: "none",
+          }}
+        >
+          <div className="flex flex-col gap-2 p-3 pb-10">
+            {col.tasks.map((task) => (
+              <TaskCard
+                key={task.id}
+                id={task.id}
+                title={task.title}
+                description={task.description}
+                completed={task.completed}
+                dueDateStart={task.dueDateStart}
+                dueDateEnd={task.dueDateEnd}
+              />
+            ))}
+          </div>
+        </div>
+        <div
+          className={cn(
+            "absolute bottom-0 left-0 right-0 h-14 pointer-events-none transition-opacity duration-200 bg-gradient-to-t from-white to-transparent",
+            maskBottom ? "opacity-100" : "opacity-0",
+          )}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -161,38 +234,7 @@ function TimeColumnGroup({ label, columns = [], showSeeMore }: Omit<TaskGroupPro
         >
           <div className="flex min-w-fit">
             {columns.map((col, colIdx) => (
-              <div
-                key={col.time}
-                className={cn(
-                  "shrink-0 border-r border-neutral-200",
-                  colIdx === 0 && "border-l border-neutral-200",
-                )}
-                style={{ width: `${CARD_COLUMN_WIDTH}px` }}
-              >
-                <div className="py-2 px-3 text-center text-sm font-semibold text-neutral-700 border-b border-neutral-200">
-                  {col.time}
-                </div>
-                <div
-                  className="overflow-y-auto"
-                  style={{
-                    minHeight: `${SECTION_CONTENT_HEIGHT}px`,
-                    maxHeight: `${SECTION_CONTENT_HEIGHT}px`,
-                    scrollbarWidth: "none",
-                  }}
-                >
-                  <div className="flex flex-col gap-2 p-3">
-                    {col.tasks.map((task) => (
-                      <TaskCard
-                        key={task.id}
-                        id={task.id}
-                        title={task.title}
-                        description={task.description}
-                        completed={task.completed}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <TimeColumn key={col.time} col={col} isFirst={colIdx === 0} />
             ))}
             <div style={{ width: `${CARD_COLUMN_WIDTH}px` }} className="shrink-0" />
           </div>

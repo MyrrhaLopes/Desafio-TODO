@@ -13,6 +13,8 @@ function toCardTask(t: TasksSelect) {
     title: t.title,
     description: t.description ?? undefined,
     completed: t.status === "done",
+    dueDateStart: (t.dueDateStart as unknown as string) ?? null,
+    dueDateEnd: (t.dueDateEnd as unknown as string) ?? null,
   };
 }
 

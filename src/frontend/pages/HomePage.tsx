@@ -3,6 +3,7 @@ import { rootRoute } from "../rootRoute";
 import { NewTaskFormBar } from "@/frontend/components/task/NewTaskFormBar";
 import { OptionsBar } from "@/frontend/components/task/OptionsBar";
 import { TaskView } from "@/frontend/components/task/TaskView";
+import { AppHeader } from "@/frontend/components/AppHeader";
 import z from "zod";
 import { taskStatusEnum } from "@/backend/db/schema";
 import { TASK_VIEW_OPTIONS, TASK_GROUPING_OPTIONS, TASK_PRAZO_OPTIONS } from "@/frontend/components/task/task-options";
@@ -32,7 +33,7 @@ export function HomePage() {
   const { data: tasks = [], isLoading } = useGetTask({ status, search });
   return (
     <div className="min-h-screen bg-[#f8f8f8]">
-      <header className="h-12 bg-neutral-800" />
+      <AppHeader />
 
       <main className="mx-auto max-w-4xl px-6 py-8 space-y-6">
         <NewTaskFormBar />

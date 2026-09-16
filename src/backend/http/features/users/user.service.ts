@@ -3,6 +3,7 @@ import { db } from "../../../db/drizzle";
 import { sessionsTable, usersTable } from "../../../db/schema";
 import { eq } from "drizzle-orm";
 
+
 export const USER_SERVICE = {
   registerUser: async (email: string, password: string) => {
     const u = await db
@@ -40,5 +41,11 @@ export const USER_SERVICE = {
     return session.id
   },
 
+  logoutUser: async (sessionId: string) => {
+    await db.delete(sessionsTable).where(eq(sessionsTable.id, sessionId));
+  },
 
+  deleteUser: async (userId: number) => {
+    await db.delete(usersTable).where(eq(usersTable.id, userId));
+  },
 };
