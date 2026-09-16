@@ -3,6 +3,7 @@ import ReactMarkdown from "react-markdown";
 import { Clock, ArrowRight } from "lucide-react";
 import { Checkbox } from "@/frontend/components/ui/checkbox";
 import { cn } from "@/frontend/shared/utils";
+import usePostTask from "@/frontend/hooks/usePostTask";
 
 export function NewTaskFormBar() {
   const [title, setTitle] = useState("");
@@ -11,6 +12,7 @@ export function NewTaskFormBar() {
   const [isPreviewingDescription, setIsPreviewingDescription] = useState(false);
   const titleRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
+  const { mutate } = usePostTask();
 
   const handleTitleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -35,12 +37,17 @@ export function NewTaskFormBar() {
 
   const handleSubmit = useCallback(() => {
     if (!title.trim()) return;
+    mutate({
+      title: title.trim(),
+      description: description.trim() || undefined,
+      status: "to-do",
+    });
     setTitle("");
     setDescription("");
     setIsExpanded(false);
     setIsPreviewingDescription(false);
     titleRef.current?.focus();
-  }, [title]);
+  }, [title, description, mutate]);
 
   if (isExpanded) {
     return (

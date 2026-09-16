@@ -13,6 +13,6 @@ export default function useGetTask({ status, search }: UseGetTaskParams) {
       status: status === "all" ? undefined : status,
       search,
     }),
-    enabled: !!user?.userId,
+    enabled: !!user?.id,
   })
 }

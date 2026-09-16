@@ -22,7 +22,7 @@ export const usersTable = pgTable("users", {
   passwordHash: text("password_hash").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
-export type UserInsert = typeof TasksTable.$inferSelect;
+export type UserInsert = typeof usersTable.$inferSelect;
 
 export const sessionsTable = pgTable("sessions", {
   id: uuid("id").primaryKey().defaultRandom(),

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { taskByIdSchema, tasksQuerySchema } from "./task.schema";
+import { postTaskBody, taskByIdSchema, tasksQuerySchema } from "./task.schema";
 import { TASK_SERVICE } from "./task.service";
 import { authorizeUser } from "../../middleware/authorizeUser";
 
@@ -19,7 +19,7 @@ taskRouter.get("/tasks/:id", authorizeUser, async (req, res, next) => {
   try {
     const { id } = taskByIdSchema.parse(req.params);
 
-    const result = await TASK_SERVICE.queryById(req.user!.id,id);
+    const result = await TASK_SERVICE.queryById(req.user!.id, id);
     if (result.length == 0) {
       return res.status(404).json({ message: "task not found" });
     }
@@ -31,6 +31,10 @@ taskRouter.get("/tasks/:id", authorizeUser, async (req, res, next) => {
 
 taskRouter.post("/tasks/", authorizeUser, async (req, res, next) => {
   try {
+    const values = postTaskBody.parse(req.body);
+    const userId = req.user!.id;
+    const task = await TASK_SERVICE.postTask({ ...values, userId });
+    return res.status(201).json(task);
   } catch (err) {
     next(err);
   }

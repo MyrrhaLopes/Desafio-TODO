@@ -30,7 +30,6 @@ export function HomePage() {
   const { status, search, view } = useSearch({ from: "/" });
 
   const { data: tasks = [], isLoading } = useGetTask({ status, search })
-
   return (
     <div className="min-h-screen bg-white">
       <header className="h-12 bg-neutral-800" />
