@@ -13,8 +13,8 @@ export const taskByIdSchema = z.object({
 export const postTaskBody = z.object({
   title: z.string().max(72),
   description: z.string().optional(),
-  dueDateStart: z.date().optional(),
-  dueDateEnd: z.date().optional(),
+  dueDateStart: z.coerce.date().optional(),
+  dueDateEnd: z.coerce.date().optional(),
   status: z.enum(taskStatusEnum.enumValues),
 });
 export type PostTaskBody = z.infer<typeof postTaskBody>;

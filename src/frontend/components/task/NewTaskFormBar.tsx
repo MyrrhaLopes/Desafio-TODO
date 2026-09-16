@@ -1,12 +1,134 @@
 import { useState, useRef, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
-import { Clock, ArrowRight } from "lucide-react";
+import { Clock, ArrowRight, X } from "lucide-react";
 import { cn } from "@/frontend/shared/utils";
 import usePostTask from "@/frontend/hooks/usePostTask";
+import { Popover, PopoverContent, PopoverTrigger } from "@/frontend/components/ui/popover";
+import { Calendar } from "@/frontend/components/ui/calendar";
 
 function StaticCheckbox() {
   return (
     <div className="w-5 h-5 shrink-0 rounded-sm border-2 border-neutral-300 bg-white" />
+  );
+}
+
+function formatDateLabel(date: Date, timeStart: string | undefined): string {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+  let label: string;
+  if (d.getTime() === today.getTime()) label = "Hoje";
+  else if (d.getTime() === tomorrow.getTime()) label = "Amanhã";
+  else label = date.toLocaleDateString("pt-BR", { day: "numeric", month: "short" });
+
+  return timeStart ? `${label}, ${timeStart}` : label;
+}
+
+const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
+const MINUTES = ["00", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55"];
+
+const selectCls = cn(
+  "text-xs border border-neutral-200 rounded px-1.5 py-1 outline-none bg-white text-neutral-700",
+  "focus:border-neutral-400 transition-colors cursor-pointer appearance-none text-center",
+);
+
+function TimeSelect({
+  label,
+  value,
+  onChange,
+  onClear,
+}: {
+  label: string;
+  value: string | undefined;
+  onChange: (v: string | undefined) => void;
+  onClear: () => void;
+}) {
+  const [h, m] = value ? value.split(":") : ["", ""];
+
+  const handleHour = (newH: string) => {
+    if (!newH) { onChange(undefined); return; }
+    onChange(`${newH}:${m || "00"}`);
+  };
+
+  const handleMinute = (newM: string) => {
+    if (!newM) { onChange(undefined); return; }
+    onChange(`${h || "00"}:${newM}`);
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-xs text-neutral-500 w-12 shrink-0">{label}</span>
+      <div className="flex items-center gap-1 ml-auto">
+        <div className="flex items-center gap-0.5">
+          <select value={h} onChange={(e) => handleHour(e.target.value)} className={selectCls} style={{ width: "3rem" }}>
+            <option value="">--</option>
+            {HOURS.map((hr) => <option key={hr} value={hr}>{hr}</option>)}
+          </select>
+          <span className="text-xs text-neutral-400">:</span>
+          <select value={m} onChange={(e) => handleMinute(e.target.value)} className={selectCls} style={{ width: "3rem" }}>
+            <option value="">--</option>
+            {MINUTES.map((min) => <option key={min} value={min}>{min}</option>)}
+          </select>
+        </div>
+        {value ? (
+          <button
+            type="button"
+            onClick={onClear}
+            className="flex items-center justify-center h-6 w-6 rounded text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600 transition-colors"
+          >
+            <X className="h-3 w-3" />
+          </button>
+        ) : (
+          <div className="w-6" />
+        )}
+      </div>
+    </div>
+  );
+}
+
+interface DateTimePickerProps {
+  date: Date | undefined;
+  timeStart: string | undefined;
+  timeEnd: string | undefined;
+  onDateChange: (date: Date | undefined) => void;
+  onTimeStartChange: (time: string | undefined) => void;
+  onTimeEndChange: (time: string | undefined) => void;
+}
+
+function DateTimePicker({
+  date,
+  timeStart,
+  timeEnd,
+  onDateChange,
+  onTimeStartChange,
+  onTimeEndChange,
+}: DateTimePickerProps) {
+  return (
+    <div className="flex flex-col gap-2">
+      <Calendar mode="single" selected={date} onSelect={onDateChange} />
+
+      <div className="border-t border-neutral-100 pt-2 flex flex-col gap-1.5">
+        <div className="flex items-center gap-1 mb-0.5">
+          <Clock className="h-3 w-3 text-neutral-400" />
+          <span className="text-xs font-medium text-neutral-500">Horário</span>
+        </div>
+        <TimeSelect
+          label="Início"
+          value={timeStart}
+          onChange={onTimeStartChange}
+          onClear={() => onTimeStartChange(undefined)}
+        />
+        <TimeSelect
+          label="Fim"
+          value={timeEnd}
+          onChange={onTimeEndChange}
+          onClear={() => onTimeEndChange(undefined)}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -15,6 +137,10 @@ export function NewTaskFormBar() {
   const [description, setDescription] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
   const [isPreviewingDescription, setIsPreviewingDescription] = useState(false);
+  const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
+  const [dueTimeStart, setDueTimeStart] = useState<string | undefined>(undefined);
+  const [dueTimeEnd, setDueTimeEnd] = useState<string | undefined>(undefined);
+  const [prazoOpen, setPrazoOpen] = useState(false);
   const titleRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
   const { mutate } = usePostTask();
@@ -27,32 +153,111 @@ export function NewTaskFormBar() {
         setTimeout(() => descriptionRef.current?.focus(), 0);
       }
     },
-    []
+    [],
   );
 
   const handleDescriptionBlur = useCallback(() => {
-    if (description.trim()) {
-      setIsPreviewingDescription(true);
-    }
+    if (description.trim()) setIsPreviewingDescription(true);
   }, [description]);
 
   const handleDescriptionFocus = useCallback(() => {
     setIsPreviewingDescription(false);
   }, []);
 
+  const handleDescriptionKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === "Backspace" && description === "") {
+        setIsExpanded(false);
+        setIsPreviewingDescription(false);
+        setTimeout(() => titleRef.current?.focus(), 0);
+      }
+    },
+    [description],
+  );
+
+  const buildDateWithTime = useCallback(
+    (base: Date, time: string | undefined): Date => {
+      const d = new Date(base);
+      if (time) {
+        const [h, m] = time.split(":").map(Number);
+        d.setHours(h, m, 0, 0);
+      } else {
+        d.setHours(0, 0, 0, 0);
+      }
+      return d;
+    },
+    [],
+  );
+
   const handleSubmit = useCallback(() => {
     if (!title.trim()) return;
+    const dueDateStart = dueDate ? buildDateWithTime(dueDate, dueTimeStart) : undefined;
+    const dueDateEnd = dueDate && dueTimeEnd ? buildDateWithTime(dueDate, dueTimeEnd) : undefined;
     mutate({
       title: title.trim(),
       description: description.trim() || undefined,
+      dueDateStart,
+      dueDateEnd,
       status: "to-do",
     });
     setTitle("");
     setDescription("");
+    setDueDate(undefined);
+    setDueTimeStart(undefined);
+    setDueTimeEnd(undefined);
     setIsExpanded(false);
     setIsPreviewingDescription(false);
     titleRef.current?.focus();
-  }, [title, description, mutate]);
+  }, [title, description, dueDate, dueTimeStart, dueTimeEnd, buildDateWithTime, mutate]);
+
+  const clearPrazo = useCallback(() => {
+    setDueDate(undefined);
+    setDueTimeStart(undefined);
+    setDueTimeEnd(undefined);
+  }, []);
+
+  const prazoLabel = dueDate ? formatDateLabel(dueDate, dueTimeStart) : "Definir prazo";
+  const hasPrazo = !!dueDate;
+
+  const PrazoButton = (
+    <Popover open={prazoOpen} onOpenChange={setPrazoOpen}>
+      <div className="inline-flex items-center">
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            className={cn(
+              "flex items-center gap-1.5 border px-3 py-1.5 text-xs transition-colors",
+              hasPrazo
+                ? "rounded-l rounded-r-none border-neutral-600 text-neutral-700 bg-neutral-100 hover:bg-neutral-200 border-r-0"
+                : "rounded border-neutral-300 text-neutral-500 bg-white hover:bg-neutral-50",
+            )}
+          >
+            <Clock className="h-3.5 w-3.5" />
+            {prazoLabel}
+          </button>
+        </PopoverTrigger>
+        {hasPrazo && (
+          <button
+            type="button"
+            onClick={clearPrazo}
+            className="inline-flex items-center h-[30px] px-1.5 border border-neutral-600 rounded-r text-neutral-400 bg-neutral-100 hover:bg-neutral-200 hover:text-neutral-600 transition-colors"
+          >
+            <X className="h-3 w-3" />
+          </button>
+        )}
+      </div>
+      <PopoverContent className="w-auto p-3" align="start">
+        <DateTimePicker
+          date={dueDate}
+          timeStart={dueTimeStart}
+          timeEnd={dueTimeEnd}
+          onDateChange={setDueDate}
+          onTimeStartChange={setDueTimeStart}
+          onTimeEndChange={setDueTimeEnd}
+        />
+      </PopoverContent>
+    </Popover>
+  );
 
   if (isExpanded) {
     return (
@@ -81,6 +286,7 @@ export function NewTaskFormBar() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   onBlur={handleDescriptionBlur}
+                  onKeyDown={handleDescriptionKeyDown}
                   placeholder="Pesquisar a respeito"
                   rows={3}
                   className="w-full text-sm text-neutral-500 placeholder:text-neutral-400 outline-none bg-transparent resize-none"
@@ -90,13 +296,7 @@ export function NewTaskFormBar() {
           </div>
         </div>
         <div className="flex items-center justify-end gap-2 px-4 pb-3 pt-1 border-t border-neutral-100">
-          <button
-            type="button"
-            className="flex items-center gap-1.5 rounded-full border border-neutral-300 px-3 py-1.5 text-xs text-neutral-500 hover:bg-neutral-50 transition-colors"
-          >
-            <Clock className="h-3.5 w-3.5" />
-            Definir prazo
-          </button>
+          {PrazoButton}
           <button
             type="button"
             onClick={handleSubmit}
@@ -104,7 +304,7 @@ export function NewTaskFormBar() {
               "flex h-8 w-8 items-center justify-center rounded-full transition-colors",
               title.trim()
                 ? "bg-neutral-900 text-white hover:bg-neutral-700"
-                : "bg-neutral-200 text-neutral-400 cursor-not-allowed"
+                : "bg-neutral-200 text-neutral-400 cursor-not-allowed",
             )}
           >
             <ArrowRight className="h-4 w-4" />
@@ -125,13 +325,7 @@ export function NewTaskFormBar() {
         placeholder="Nova tarefa"
         className="flex-1 text-sm text-neutral-900 placeholder:text-neutral-400 outline-none bg-transparent min-w-0"
       />
-      <button
-        type="button"
-        className="flex shrink-0 items-center gap-1.5 rounded-full border border-neutral-300 px-3 py-1.5 text-xs text-neutral-500 hover:bg-neutral-50 transition-colors"
-      >
-        <Clock className="h-3.5 w-3.5" />
-        Definir prazo
-      </button>
+      {PrazoButton}
       <span className="hidden md:block shrink-0 text-xs text-neutral-400 whitespace-nowrap px-2">
         Shift + Enter para adicionar descrição
       </span>
@@ -142,7 +336,7 @@ export function NewTaskFormBar() {
           "flex shrink-0 h-8 w-8 items-center justify-center rounded-full transition-colors",
           title.trim()
             ? "bg-neutral-900 text-white hover:bg-neutral-700"
-            : "bg-neutral-200 text-neutral-400 cursor-not-allowed"
+            : "bg-neutral-200 text-neutral-400 cursor-not-allowed",
         )}
       >
         <ArrowRight className="h-4 w-4" />

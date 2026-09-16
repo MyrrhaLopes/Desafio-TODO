@@ -123,31 +123,33 @@ function TaskPage() {
         </button>
 
         <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={handleToggleComplete}
-              className={cn(
-                "w-6 h-6 shrink-0 rounded-sm border-2 flex items-center justify-center transition-colors",
-                completed
-                  ? "bg-neutral-800 border-neutral-800"
-                  : "bg-white border-neutral-400 hover:border-neutral-600",
-              )}
-            >
-              {completed && (
-                <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-              )}
-            </button>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <button
+                type="button"
+                onClick={handleToggleComplete}
+                className={cn(
+                  "w-6 h-6 shrink-0 rounded-sm border-2 flex items-center justify-center transition-colors",
+                  completed
+                    ? "bg-neutral-800 border-neutral-800"
+                    : "bg-white border-neutral-400 hover:border-neutral-600",
+                )}
+              >
+                {completed && (
+                  <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </button>
 
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="flex-1 text-2xl font-bold text-neutral-900 bg-transparent outline-none border-b border-neutral-300 focus:border-neutral-600 transition-colors pb-0.5"
-            />
+              <input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="flex-1 min-w-0 text-2xl font-bold text-neutral-900 bg-transparent outline-none border-b border-neutral-300 focus:border-neutral-600 transition-colors pb-0.5"
+              />
+            </div>
 
-            <div className="flex items-center gap-2 ml-auto shrink-0">
+            <div className="flex items-center gap-2 pl-9 sm:pl-0 shrink-0">
               <button
                 type="button"
                 onClick={handleSave}
